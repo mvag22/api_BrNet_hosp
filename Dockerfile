@@ -1,17 +1,21 @@
-# Etapa 1 - Build da aplicação
+# Etapa de build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copiar arquivos do projeto
-COPY *.sln .
-COPY ApiBrnetEstoque/*.csproj ./ApiBrnetEstoque/
+# Copia arquivos da solução e csproj
+COPY *.sln ./
+COPY *.csproj ./
+
+# Restaura dependências
 RUN dotnet restore
 
-COPY ApiBrnetEstoque/. ./ApiBrnetEstoque/
-WORKDIR /src/ApiBrnetEstoque
+# Copia todo o restante do projeto
+COPY . ./
+
+# Publica a aplicação em modo Release
 RUN dotnet publish -c Release -o /app/publish
 
-# Etapa 2 - Runtime (imagem menor)
+# Etapa de runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
