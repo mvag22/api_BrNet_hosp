@@ -9,11 +9,16 @@ using Microsoft.IdentityModel.Tokens;
 //configuração de conexão com o banco de dados
 var builder = WebApplication.CreateBuilder(args);
 
+// Carregar variáveis de ambiente
+builder.Configuration.AddEnvironmentVariables();
+
+// Substituir manualmente o placeholder
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? $"Server={Environment.GetEnvironmentVariable("DB_HOST")};Database={Environment.GetEnvironmentVariable("DB_NAME")};User={Environment.GetEnvironmentVariable("DB_USER")};Password={Environment.GetEnvironmentVariable("DB_PASSWORD")};";
+    .Replace("__MYSQL_PASSWORD__", Environment.GetEnvironmentVariable("MYSQL_PASSWORD"));
 
 builder.Services.AddDbContext<BdBrnetEstoqueContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
 
 
 
@@ -57,7 +62,6 @@ builder.Services
 builder.Services.AddScoped<EquipamentoReservaService>();
 builder.Services.AddScoped<ChecklistVeiculoService>();
 builder.Services.AddScoped<EstoqueService>();
-builder.Services.AddScoped<MaterialUtilizadoService>();
 builder.Services.AddScoped<MaterialUtilizadoService>();
 builder.Services.AddScoped<ControleKmService>();
 builder.Services.AddScoped<UsuarioService>();
