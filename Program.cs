@@ -6,31 +6,16 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-
+//configuração de conexão com o banco de dados
 var builder = WebApplication.CreateBuilder(args);
 
-// ==========================
-// BANCO DE DADOS (MySQL)
-// ==========================
-var host = Environment.GetEnvironmentVariable("MYSQLHOST") ?? "localhost";
-var port = Environment.GetEnvironmentVariable("MYSQLPORT") ?? "3306";
-var user = Environment.GetEnvironmentVariable("MYSQLUSER") ?? "root";
-var pwd = Environment.GetEnvironmentVariable("MYSQLPASSWORD") ?? "";
-var db = Environment.GetEnvironmentVariable("MYSQLDATABASE") ?? "appdb";
-
-var connString = $"server={host};port={port};database={db};user={user};password={pwd};SslMode=none";
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? $"Server={Environment.GetEnvironmentVariable("DB_HOST")};Database={Environment.GetEnvironmentVariable("DB_NAME")};User={Environment.GetEnvironmentVariable("DB_USER")};Password={Environment.GetEnvironmentVariable("DB_PASSWORD")};";
 
 builder.Services.AddDbContext<BdBrnetEstoqueContext>(options =>
-    options.UseMySql(connString, ServerVersion.AutoDetect(connString))
-);
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-/* banco de dados (MySQL)
-builder.Services.AddDbContext<BdBrnetEstoqueContext>(options =>
-    options.UseMySql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
-    )
-);*/
+
 
 // passwordhasher
 builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
